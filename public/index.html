@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alarmempfänger erfassen</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #1a1a2e;
+      margin-bottom: 0.25rem;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      color: #666;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.375rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.625rem 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      color: #1a1a2e;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #4a6cf7;
+      box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.18);
+    }
+
+    input.invalid {
+      border-color: #e53e3e;
+    }
+
+    .error-msg {
+      font-size: 0.75rem;
+      color: #e53e3e;
+      margin-top: 0.25rem;
+      display: none;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.75rem;
+      background: #4a6cf7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s;
+    }
+
+    button[type="submit"]:hover {
+      background: #3756d6;
+    }
+
+    #status {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    #status.success {
+      background: #e6f4ea;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
+    }
+
+    #status.error {
+      background: #fdecea;
+      color: #c62828;
+      border: 1px solid #ef9a9a;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Alarmempfänger erfassen</h1>
+    <p class="subtitle">Bitte füllen Sie alle Felder aus.</p>
+
+    <form id="empfaengerForm" novalidate>
+      <div class="form-group">
+        <label for="vorname">Vorname <span aria-hidden="true">*</span></label>
+        <input
+          type="text"
+          id="vorname"
+          name="vorname"
+          placeholder="Max"
+          autocomplete="given-name"
+          required
+        />
+        <p class="error-msg" id="vorname-error">Bitte geben Sie einen Vornamen ein.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="nachname">Nachname <span aria-hidden="true">*</span></label>
+        <input
+          type="text"
+          id="nachname"
+          name="nachname"
+          placeholder="Mustermann"
+          autocomplete="family-name"
+          required
+        />
+        <p class="error-msg" id="nachname-error">Bitte geben Sie einen Nachnamen ein.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-Mail-Adresse <span aria-hidden="true">*</span></label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="max.mustermann@beispiel.de"
+          autocomplete="email"
+          required
+        />
+        <p class="error-msg" id="email-error">Bitte geben Sie eine gültige E-Mail-Adresse ein.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="telefon">Telefonnummer <span aria-hidden="true">*</span></label>
+        <input
+          type="tel"
+          id="telefon"
+          name="telefon"
+          placeholder="+49 123 4567890"
+          autocomplete="tel"
+          required
+        />
+        <p class="error-msg" id="telefon-error">Bitte geben Sie eine Telefonnummer ein.</p>
+      </div>
+
+      <button type="submit">Speichern</button>
+
+      <div id="status" role="alert" aria-live="polite"></div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('empfaengerForm');
+    const statusBox = document.getElementById('status');
+
+    function setError(fieldId, show) {
+      const input = document.getElementById(fieldId);
+      const msg = document.getElementById(fieldId + '-error');
+      if (show) {
+        input.classList.add('invalid');
+        msg.style.display = 'block';
+      } else {
+        input.classList.remove('invalid');
+        msg.style.display = 'none';
+      }
+    }
+
+    function validateField(input) {
+      if (input.id === 'email') {
+        return input.value.trim() !== '' && input.validity.valid;
+      }
+      return input.value.trim() !== '';
+    }
+
+    ['vorname', 'nachname', 'email', 'telefon'].forEach((id) => {
+      document.getElementById(id).addEventListener('input', () => {
+        const input = document.getElementById(id);
+        if (validateField(input)) {
+          setError(id, false);
+        }
+      });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const fields = ['vorname', 'nachname', 'email', 'telefon'];
+      let valid = true;
+
+      fields.forEach((id) => {
+        const input = document.getElementById(id);
+        if (!validateField(input)) {
+          setError(id, true);
+          valid = false;
+        } else {
+          setError(id, false);
+        }
+      });
+
+      if (!valid) return;
+
+      const data = {
+        vorname: document.getElementById('vorname').value.trim(),
+        nachname: document.getElementById('nachname').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        telefon: document.getElementById('telefon').value.trim(),
+      };
+
+      try {
+        const response = await fetch('/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        statusBox.className = result.success ? 'success' : 'error';
+        statusBox.textContent = result.message;
+        statusBox.style.display = 'block';
+
+        if (result.success) {
+          form.reset();
+        }
+      } catch {
+        statusBox.className = 'error';
+        statusBox.textContent = 'Ein Netzwerkfehler ist aufgetreten. Bitte versuchen Sie es erneut.';
+        statusBox.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
