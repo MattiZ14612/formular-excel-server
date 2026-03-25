@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alarmempfänger – Formular</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📋 Alarmempfänger</h1>
+      <p class="subtitle">Neuen Alarmempfänger erfassen</p>
+    </header>
+
+    <main>
+      <form id="alarmForm" novalidate>
+        <div class="form-group">
+          <label for="name">Name <span class="required">*</span></label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Max Mustermann"
+            required
+            autocomplete="name"
+          />
+          <span class="field-error" id="nameError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-Mail <span class="required">*</span></label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="max@beispiel.de"
+            required
+            autocomplete="email"
+          />
+          <span class="field-error" id="emailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Telefon</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            placeholder="+49 123 4567890"
+            autocomplete="tel"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="comment">Kommentar</label>
+          <textarea
+            id="comment"
+            name="comment"
+            rows="4"
+            placeholder="Weitere Hinweise …"
+          ></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" id="submitBtn">
+          <span id="btnText">Excel-Datei erstellen</span>
+          <span id="btnSpinner" class="spinner hidden" aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <div id="successBox" class="result-box success hidden" role="alert">
+        <strong>✅ Erfolgreich gespeichert!</strong>
+        <p id="successMessage"></p>
+        <a id="downloadLink" href="#" class="btn-secondary">⬇ Datei herunterladen</a>
+      </div>
+
+      <div id="errorBox" class="result-box error hidden" role="alert">
+        <strong>❌ Fehler</strong>
+        <p id="errorMessage"></p>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
