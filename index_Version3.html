@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rumpfgeschwindigkeit Rechner (LWL)</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #121b2f;
+      --text: #e8eefc;
+      --muted: #a9b6d6;
+      --accent: #6aa6ff;
+      --danger: #ff6a6a;
+      --border: rgba(255,255,255,.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% 10%, #142247 0%, var(--bg) 55%, #070b14 100%);
+      color: var(--text);
+      line-height: 1.45;
+    }
+    .wrap { max-width: 780px; margin: 40px auto; padding: 0 16px; }
+    header h1 { margin: 0 0 6px; font-size: 1.6rem; letter-spacing: .2px; }
+    header p { margin: 0 0 18px; color: var(--muted); }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 820px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+    .card {
+      background: color-mix(in oklab, var(--card), #000 10%);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+
+    label { display:block; font-weight:600; margin: 10px 0 6px; }
+    .hint { font-size: .9rem; color: var(--muted); margin-top: 4px; }
+
+    input[type="number"]{
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      outline: none;
+    }
+    input[type="number"]:focus {
+      border-color: color-mix(in oklab, var(--accent), white 10%);
+      box-shadow: 0 0 0 4px rgba(106,166,255,.15);
+    }
+
+    .error { color: var(--danger); font-size: .92rem; margin-top: 10px; display: none; }
+
+    .kpi {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255,255,255,.03);
+      margin-top: 10px;
+    }
+    .kpi .label { color: var(--muted); font-size: .92rem; }
+    .kpi .value { font-size: 1.5rem; font-weight: 750; margin-top: 2px; }
+
+    .small { font-size: .9rem; color: var(--muted); margin-top: 10px; }
+    .formula {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 10px;
+      overflow-x: auto;
+      color: #d8e6ff;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Rumpfgeschwindigkeit Rechner</h1>
+      <p>Berechnung aus <strong>LWL</strong> (Wasserlinienlänge). Ausgabe in <strong>kn</strong> und <strong>km/h</strong>.</p>
+    </header>
+
+    <div class="grid">
+      <section class="card" aria-label="Eingaben">
+        <h2 style="margin:0 0 8px;">Eingabe</h2>
+
+        <label for="lwl">LWL (m)</label>
+        <input id="lwl" type="number" inputmode="decimal" min="0" step="0.01" placeholder="z. B. 8.50" />
+        <div class="hint">Wasserlinienlänge in Metern.</div>
+
+        <div id="error" class="error" role="alert"></div>
+
+        <div class="small">
+          Verwendete Näherung:
+          <div class="formula">v<sub>kn</sub> = 2.43 · √(LWL<sub>m</sub>) &nbsp;&nbsp;|&nbsp;&nbsp; v<sub>km/h</sub> = v<sub>kn</sub> · 1.852</div>
+        </div>
+      </section>
+
+      <section class="card" aria-label="Ergebnisse">
+        <h2 style="margin:0 0 8px;">Ergebnis</h2>
+
+        <div class="kpi">
+          <div class="label">Rumpfgeschwindigkeit</div>
+          <div class="value" id="vKn">– kn</div>
+          <div class="hint" id="vKmh">– km/h</div>
+        </div>
+
+        <div class="small">
+          Hinweis: Das ist eine Daumenregel für Verdränger. Die erreichbare Geschwindigkeit hängt u. a. von Rumpfform, Verdrängung, Bewuchs/Trimm und Wellen ab.
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const lwlEl = document.getElementById("lwl");
+    const errEl = document.getElementById("error");
+    const vKnEl = document.getElementById("vKn");
+    const vKmhEl = document.getElementById("vKmh");
+
+    function fmt(n, digits = 2) {
+      if (!Number.isFinite(n)) return "–";
+      return n.toLocaleString("de-DE", { maximumFractionDigits: digits, minimumFractionDigits: digits });
+    }
+
+    function setError(msg) {
+      if (msg) {
+        errEl.textContent = msg;
+        errEl.style.display = "block";
+      } else {
+        errEl.textContent = "";
+        errEl.style.display = "none";
+      }
+    }
+
+    function calc() {
+      const raw = lwlEl.value;
+
+      if (!raw) {
+        setError("");
+        vKnEl.textContent = "– kn";
+        vKmhEl.textContent = "– km/h";
+        return;
+      }
+
+      const lwl = Number(raw);
+
+      if (!Number.isFinite(lwl) || lwl <= 0) {
+        setError("Bitte eine LWL > 0 eingeben.");
+        vKnEl.textContent = "– kn";
+        vKmhEl.textContent = "– km/h";
+        return;
+      }
+
+      setError("");
+
+      // metric approximation: v_kn = 2.43 * sqrt(LWL_m)
+      const vKn = 2.43 * Math.sqrt(lwl);
+      const vKmh = vKn * 1.852;
+
+      vKnEl.textContent = `${fmt(vKn, 2)} kn`;
+      vKmhEl.textContent = `${fmt(vKmh, 2)} km/h`;
+    }
+
+    lwlEl.addEventListener("input", calc);
+    calc();
+  </script>
+</body>
+</html>
