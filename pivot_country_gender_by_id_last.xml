@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:excel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <Worksheet ss:Name="PivotTable">
+    <Table>
+      <Row>
+        <Cell><Data ss:Type="String">Country</Data></Cell>
+        <Cell><Data ss:Type="Number">Female</Data></Cell>
+        <Cell><Data ss:Type="Number">Male</Data></Cell>
+        <Cell><Data ss:Type="Number">Total</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">United States</Data></Cell>
+        <Cell><Data ss:Type="Number">14</Data></Cell>
+        <Cell><Data ss:Type="Number">11</Data></Cell>
+        <Cell><Data ss:Type="Number">25</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Great Britain</Data></Cell>
+        <Cell><Data ss:Type="Number">15</Data></Cell>
+        <Cell><Data ss:Type="Number">1</Data></Cell>
+        <Cell><Data ss:Type="Number">16</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">France</Data></Cell>
+        <Cell><Data ss:Type="Number">9</Data></Cell>
+        <Cell><Data ss:Type="Number">1</Data></Cell>
+        <Cell><Data ss:Type="Number">10</Data></Cell>
+      </Row>
+      <Row>
+        <Cell><Data ss:Type="String">Total</Data></Cell>
+        <Cell><Data ss:Type="Number">38</Data></Cell>
+        <Cell><Data ss:Type="Number">13</Data></Cell>
+        <Cell><Data ss:Type="Number">51</Data></Cell>
+      </Row>
+    </Table>
+  </Worksheet>
+</Workbook>
